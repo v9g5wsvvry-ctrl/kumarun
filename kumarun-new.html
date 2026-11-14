@@ -1,1 +1,119 @@
-kumarun-new.html
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>くまルン</title>
+<style>
+  :root { --bg:#fff7ec; --card:#fff; --ink:#4a3322; --accent:#e58a3a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Hiragino Sans",sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; }
+  .card { background:var(--card); border-radius:20px; box-shadow:0 4px 16px rgba(0,0,0,.08); padding:28px 22px; width:100%; max-width:380px; text-align:center; }
+  .bear { font-size:56px; line-height:1; }
+  h1 { font-size:20px; margin:12px 0 6px; }
+  .fortune { font-size:30px; font-weight:800; color:var(--accent); margin:14px 0; }
+  p { margin:8px 0; line-height:1.6; font-size:16px; }
+  .choices { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+  button.choice { border:2px solid var(--accent); background:#fff; color:var(--accent); font-size:16px; font-weight:700; padding:10px 14px; border-radius:999px; }
+  button.choice.on { background:var(--accent); color:#fff; }
+  .rank { text-align:left; display:inline-block; font-size:18px; }
+  .note { font-size:11px; color:#999; margin-top:18px; text-align:center; }
+  .note a { color:#999; }
+  .count { font-size:12px; color:#aaa; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<div class="card" id="card"></div>
+<div class="note">
+  タッチ回数を記録しています（このスマホの中だけに保存）<br>
+  <a href="#" id="reset">記録を消す</a>
+</div>
+
+<script>
+(function () {
+  var KEY = "kumarun_v1";
+  var FOODS = ["ラーメン", "カレー", "甘いもの"];
+  var LUCK = ["ラーメン運◎", "カレー運○", "寿司運◎", "たこ焼き運○", "甘いもの運◎", "うどん運○", "焼き肉運◎", "おにぎり運○"];
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { return null; }
+  }
+  function save(s) {
+    try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {}
+  }
+  function stateName(n) {
+    if (n <= 0) return "未接触状態";
+    if (n === 1) return "初回接触状態";
+    if (n <= 3) return "認知状態";
+    if (n === 4) return "継続接触状態";
+    return "信頼状態";
+  }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  var s = load() || { count: 0, lastChoice: null, lastAt: 0, history: [], transitions: [] };
+  var now = Date.now();
+
+  if (!s.lastAt || now - s.lastAt > 30000) {
+    var before = stateName(s.count);
+    s.count += 1;
+    var after = stateName(s.count);
+    s.history.push({ at: now, count: s.count });
+    if (before !== after) s.transitions.push({ at: now, from: before, to: after });
+    s.todayLuck = pick(LUCK);
+    s.lastAt = now;
+    save(s);
+  }
+  if (!s.todayLuck) { s.todayLuck = pick(LUCK); save(s); }
+
+  var card = document.getElementById("card");
+
+  function choicesHtml() {
+    return '<div class="choices">' + FOODS.map(function (f) {
+      return '<button class="choice' + (s.lastChoice === f ? " on" : "") + '" data-f="' + f + '">' + f + '</button>';
+    }).join("") + '</div>';
+  }
+
+  function render() {
+    var n = s.count, html = "";
+    var head = '<div class="count">' + n + '回目のタッチ ／ ' + stateName(n) + '</div>';
+    if (n === 1) {
+      html = head + '<div class="bear">🐻</div><h1>はじめまして！</h1><p>今日のご飯運</p>' +
+        '<div class="fortune">' + s.todayLuck + '</div><p>何が出た？くまに教えてね</p>' + choicesHtml();
+    } else if (n === 2) {
+      var prev = s.lastChoice ? '前回は「' + s.lastChoice + '」を選んだよね' : '来てくれてうれしい！';
+      var rec = s.lastChoice === "ラーメン" ? "辛いラーメン" : s.lastChoice === "カレー" ? "スパイスカレー" : s.lastChoice === "甘いもの" ? "プリン" : "くまのおすすめ定食";
+      html = head + '<div class="bear">🐻</div><h1>また来てくれたね！</h1><p>' + prev + '</p>' +
+        '<p>今日のご飯運</p><div class="fortune">' + s.todayLuck + '</div><p>くまのおすすめ：<b>' + rec + '</b></p>' + choicesHtml();
+    } else if (n === 3) {
+      html = head + '<div class="bear">🐻</div><h1>3回目だね！</h1><p>くま特別ランキング</p>' +
+        '<div class="rank">1位 カレー<br>2位 寿司<br>3位 ラーメン</div><p>友達にも見せてあげて</p>' + choicesHtml();
+    } else if (n === 4) {
+      html = head + '<div class="bear">🐻</div><h1>だいぶ仲良しになったね</h1><p>今日のご飯運</p>' +
+        '<div class="fortune">大吉🍙</div><p>一緒に食べる人を探すと運気UP</p>' + choicesHtml();
+    } else {
+      html = head + '<div class="bear">🐻✨</div><h1>くまの特別なお友達に認定！</h1><p>' + n + '回も会いに来てくれたね</p>' +
+        '<div class="fortune">限定の運勢</div><p>今日だけの特別なご飯運：<b>' + s.todayLuck + '</b></p>';
+    }
+    card.innerHTML = html;
+    var btns = card.querySelectorAll("button.choice");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].addEventListener("click", function (e) {
+        s.lastChoice = e.currentTarget.getAttribute("data-f");
+        save(s);
+        render();
+      });
+    }
+  }
+  render();
+
+  document.getElementById("reset").addEventListener("click", function (e) {
+    e.preventDefault();
+    if (confirm("このスマホの記録を消しますか？")) {
+      try { localStorage.removeItem(KEY); } catch (er) {}
+      location.reload();
+    }
+  });
+})();
+</script>
+</body>
+</html>
