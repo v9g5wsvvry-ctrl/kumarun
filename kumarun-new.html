@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="ja">
 <head>
 <meta charset="utf-8">
@@ -18,13 +17,24 @@
   .bear { font-size:56px; line-height:1; }
   h1 { font-size:20px; margin:12px 0 6px; }
   .fortune { font-size:30px; font-weight:800; color:var(--accent); margin:14px 0; }
+  .title { display:inline-block; font-size:26px; font-weight:800; color:#fff; background:var(--accent); padding:8px 18px; border-radius:999px; margin:12px 0; }
+  .mytitle { font-size:14px; margin-top:6px; color:#8a6a4f; }
+  .mytitle b { color:var(--accent); }
   p { margin:8px 0; line-height:1.6; font-size:16px; }
   .choices { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
-  button.choice { border:2px solid var(--accent); background:#fff; color:var(--accent); font-size:16px; font-weight:700; padding:10px 14px; border-radius:999px; }
+  button.choice, button.fchoice { border:2px solid var(--accent); background:#fff; color:var(--accent); font-size:16px; font-weight:700; padding:10px 14px; border-radius:999px; }
   button.choice.on { background:var(--accent); color:#fff; }
-  .rank { text-align:left; display:inline-block; font-size:18px; }
-  .follow { display:block; margin-top:22px; padding:12px 14px; border-radius:14px; background:#222; color:#fff; text-decoration:none; font-size:15px; font-weight:700; }
-  .note { font-size:11px; color:#999; margin-top:18px; text-align:center; }
+  button.fchoice { font-size:14px; padding:8px 12px; }
+  button.fchoice.on { background:var(--accent); color:#fff; }
+  .rank { text-align:left; display:inline-block; font-size:16px; }
+  .friend { margin-top:20px; padding:14px 10px; background:#fff3e3; border-radius:14px; }
+  .friend .ft { font-size:14px; margin:0 0 6px; }
+  .fresult { font-size:15px; font-weight:700; color:var(--accent); margin-top:10px; min-height:22px; }
+  .coupon { margin-top:18px; padding:12px; border:2px dashed var(--accent); border-radius:14px; background:#fffaf2; font-size:14px; line-height:1.5; }
+  .coupon b { color:var(--accent); font-size:15px; }
+  button.share { display:block; width:100%; margin-top:18px; padding:12px; border:2px solid var(--accent); background:#fff; color:var(--accent); font-size:15px; font-weight:700; border-radius:14px; }
+  .follow { display:block; margin-top:12px; padding:12px 14px; border-radius:14px; background:#222; color:#fff; text-decoration:none; font-size:15px; font-weight:700; }
+  .note { font-size:11px; color:#999; margin-top:18px; text-align:center; max-width:380px; line-height:1.6; }
   .note a { color:#999; }
 </style>
 </head>
@@ -32,6 +42,7 @@
 <div class="card" id="card"></div>
 <div class="note">
   タッチ回数を記録しています（このスマホの中だけに保存）<br>
+  名前・連絡先などは集めません<br>
   <a href="#" id="reset">記録を消す</a>
 </div>
 
@@ -41,6 +52,15 @@
   var TIKTOK = "https://www.tiktok.com/@rg99do";
   var FOODS = ["ラーメン", "カレー", "甘いもの"];
   var LUCK = ["ラーメン運◎", "カレー運○", "寿司運◎", "たこ焼き運○", "甘いもの運◎", "うどん運○", "焼き肉運◎", "おにぎり運○"];
+  var TITLES = { "ラーメン": "ラーメン番長", "カレー": "カレー博士", "甘いもの": "スイーツ大使" };
+
+  // 店ごとの特典。URLの最後に ?shop=demo のように付けたときだけ表示されます。
+  var SHOPS = {
+    demo: { name: "デモ店", c3: "ドリンク1杯サービス（デモ表示）", c5: "トッピング1つ無料（デモ表示）" }
+  };
+  var shopKey = "";
+  try { shopKey = new URLSearchParams(location.search).get("shop") || ""; } catch (e) {}
+  var shop = SHOPS[shopKey] || null;
 
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { return null; }
@@ -64,7 +84,7 @@
     var before = stateName(s.count);
     s.count += 1;
     var after = stateName(s.count);
-    s.history.push({ at: now, count: s.count });
+    s.history.push({ at: now, count: s.count, shop: shopKey });
     if (before !== after) s.transitions.push({ at: now, from: before, to: after });
     s.todayLuck = pick(LUCK);
     s.lastAt = now;
@@ -80,8 +100,30 @@
     }).join("") + '</div>';
   }
 
+  function friendHtml() {
+    return '<div class="friend"><p class="ft">友達と一緒？<br>友達の画面は何が出た？</p>' +
+      '<div class="choices" style="margin-top:6px">' + FOODS.map(function (f) {
+        return '<button class="fchoice" data-ff="' + f + '">' + f + '</button>';
+      }).join("") + '</div><div class="fresult" id="fresult"></div></div>';
+  }
+
+  function couponHtml(n) {
+    if (!shop) return "";
+    if (n >= 5) return '<div class="coupon">🎁 <b>' + shop.name + ' 特典</b><br>' + shop.c5 + '<br>この画面をお店の人に見せてね</div>';
+    if (n >= 3) return '<div class="coupon">🎁 <b>' + shop.name + ' 特典</b><br>' + shop.c3 + '<br>この画面をお店の人に見せてね<br><small>あと' + (5 - n) + '回のタッチで、さらに特典！</small></div>';
+    return '<div class="coupon">🎁 <b>' + shop.name + '</b><br>あと' + (3 - n) + '回のタッチで特典が出るよ</div>';
+  }
+
+  function titleLine() {
+    return s.title ? '<div class="mytitle">あなたの称号：<b>' + s.title + '</b></div>' : "";
+  }
+
   function render() {
     var n = s.count, html = "";
+    if (n >= 3 && !s.title) {
+      s.title = TITLES[s.lastChoice] || "くま見習い";
+      save(s);
+    }
     var head = '<div class="counter"><div class="label">タッチ回数</div><div class="num">' + n + '<small>回</small></div></div>' +
                '<div class="state">' + stateName(n) + '</div>';
     if (n === 1) {
@@ -93,17 +135,23 @@
       html = head + '<div class="bear">🐻</div><h1>また来てくれたね！</h1><p>' + prev + '</p>' +
         '<p>今日のご飯運</p><div class="fortune">' + s.todayLuck + '</div><p>くまのおすすめ：<b>' + rec + '</b></p>' + choicesHtml();
     } else if (n === 3) {
-      html = head + '<div class="bear">🐻</div><h1>3回目だね！</h1><p>くま特別ランキング</p>' +
-        '<div class="rank">1位 カレー<br>2位 寿司<br>3位 ラーメン</div><p>友達にも見せてあげて</p>' + choicesHtml();
+      html = head + '<div class="bear">🐻🎉</div><h1>3回目！称号ゲット</h1><p>あなたは</p>' +
+        '<div class="title">' + s.title + '</div><p>に認定されました</p>' +
+        '<p style="font-size:14px;color:#8a6a4f">スクショして友達に見せてね</p>' +
+        '<div class="rank">くま特別ランキング<br>1位 カレー ／ 2位 寿司 ／ 3位 ラーメン</div>' + choicesHtml();
     } else if (n === 4) {
       html = head + '<div class="bear">🐻</div><h1>だいぶ仲良しになったね</h1><p>今日のご飯運</p>' +
-        '<div class="fortune">大吉🍙</div><p>一緒に食べる人を探すと運気UP</p>' + choicesHtml();
+        '<div class="fortune">大吉🍙</div><p>一緒に食べる人を探すと運気UP</p>' + titleLine() + choicesHtml();
     } else {
       html = head + '<div class="bear">🐻✨</div><h1>くまの特別なお友達に認定！</h1><p>' + n + '回も会いに来てくれたね</p>' +
-        '<div class="fortune">限定の運勢</div><p>今日だけの特別なご飯運：<b>' + s.todayLuck + '</b></p>';
+        '<div class="fortune">限定の運勢</div><p>今日だけの特別なご飯運：<b>' + s.todayLuck + '</b></p>' + titleLine();
     }
+    if (n >= 2) html += friendHtml();
+    html += couponHtml(n);
+    html += '<button class="share" id="share">友達に見せる・送る 🐻</button>';
     html += '<a class="follow" href="' + TIKTOK + '" target="_blank" rel="noopener">TikTokでフォロー＆DMしてね 🐻</a>';
     card.innerHTML = html;
+
     var btns = card.querySelectorAll("button.choice");
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener("click", function (e) {
@@ -112,6 +160,34 @@
         render();
       });
     }
+
+    var fbtns = card.querySelectorAll("button.fchoice");
+    for (var j = 0; j < fbtns.length; j++) {
+      fbtns[j].addEventListener("click", function (e) {
+        var ff = e.currentTarget.getAttribute("data-ff");
+        var all = card.querySelectorAll("button.fchoice");
+        for (var k = 0; k < all.length; k++) all[k].classList.remove("on");
+        e.currentTarget.classList.add("on");
+        var out = document.getElementById("fresult");
+        if (!s.lastChoice) { out.textContent = "先に自分の分を選んでね 🐻"; return; }
+        out.textContent = (ff === s.lastChoice)
+          ? "ご飯の好みがぴったり！今日は一緒に食べると◎ 🍚"
+          : "違うからこそ、分け合うと◎ 半分こしてみて 🍴";
+      });
+    }
+
+    var sh = document.getElementById("share");
+    if (sh) sh.addEventListener("click", function () {
+      var url = location.origin + location.pathname + (shopKey ? "?shop=" + encodeURIComponent(shopKey) : "");
+      var text = "くまルンで今日のご飯運を見たよ🐻 触るたびに変わるよ";
+      if (navigator.share) {
+        navigator.share({ title: "くまルン", text: text, url: url }).catch(function () {});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(text + " " + url).then(function () { alert("コピーしました。友達に送ってね"); });
+      } else {
+        prompt("コピーして友達に送ってね", text + " " + url);
+      }
+    });
   }
   render();
 
