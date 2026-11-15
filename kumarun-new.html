@@ -5,37 +5,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>くまルン</title>
 <style>
-  :root { --bg:#fff7ec; --card:#fff; --ink:#4a3322; --accent:#e58a3a; }
+  :root { --bg:#fff7ec; --card:#fff; --ink:#4a3322; --accent:#e58a3a; --soft:#fff3e3; --sub:#8a6a4f; --btnbg:#fff; --note:#999; }
+  body.live { --bg:#16121f; --card:#241c33; --ink:#fff; --accent:#ff9f2e; --soft:#322748; --sub:#c9b8e8; --btnbg:#241c33; --note:#a99bc4; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Hiragino Sans",sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; }
-  .card { background:var(--card); border-radius:20px; box-shadow:0 4px 16px rgba(0,0,0,.08); padding:24px 22px 28px; width:100%; max-width:380px; text-align:center; }
+  .card { background:var(--card); border-radius:20px; box-shadow:0 4px 16px rgba(0,0,0,.12); padding:24px 22px 28px; width:100%; max-width:380px; text-align:center; }
   .counter { background:var(--accent); color:#fff; border-radius:16px; padding:10px 0 8px; margin-bottom:16px; }
   .counter .label { font-size:13px; opacity:.9; }
   .counter .num { font-size:44px; font-weight:800; line-height:1.1; }
   .counter .num small { font-size:20px; font-weight:700; margin-left:2px; }
-  .state { font-size:12px; color:#aaa; margin-bottom:6px; }
+  .state { font-size:12px; color:var(--note); margin-bottom:6px; }
   .bear { font-size:56px; line-height:1; }
   h1 { font-size:20px; margin:12px 0 6px; }
   .fortune { font-size:30px; font-weight:800; color:var(--accent); margin:14px 0; }
+  .fortune.sm { font-size:19px; line-height:1.5; }
   .title { display:inline-block; font-size:26px; font-weight:800; color:#fff; background:var(--accent); padding:8px 18px; border-radius:999px; margin:12px 0; }
-  .mytitle { font-size:14px; margin-top:6px; color:#8a6a4f; }
+  .mytitle { font-size:14px; margin-top:6px; color:var(--sub); }
   .mytitle b { color:var(--accent); }
+  .mission { margin-top:16px; padding:12px; border-radius:14px; background:var(--soft); font-size:15px; line-height:1.6; }
+  .teaser { font-size:13px; color:var(--sub); margin-top:14px; line-height:1.6; }
+  .memo { margin-top:16px; padding:14px; border:2px solid var(--accent); border-radius:16px; background:var(--soft); text-align:left; font-size:15px; line-height:1.8; }
+  .memo .mh { font-weight:800; color:var(--accent); text-align:center; margin-bottom:6px; }
+  .memo .mt { text-align:center; font-size:12px; color:var(--sub); margin-top:6px; }
+  .ask { margin:16px 0 0; font-size:15px; font-weight:700; }
   p { margin:8px 0; line-height:1.6; font-size:16px; }
-  .choices { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
-  button.choice, button.fchoice { border:2px solid var(--accent); background:#fff; color:var(--accent); font-size:16px; font-weight:700; padding:10px 14px; border-radius:999px; }
-  button.choice.on { background:var(--accent); color:#fff; }
+  .choices { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
+  button.choice, button.fchoice, button.achoice, button.schoice, button.dchoice { border:2px solid var(--accent); background:var(--btnbg); color:var(--accent); font-size:16px; font-weight:700; padding:10px 14px; border-radius:999px; }
+  button.choice.on, button.achoice.on, button.schoice.on, button.dchoice.on { background:var(--accent); color:#fff; }
   button.fchoice { font-size:14px; padding:8px 12px; }
   button.fchoice.on { background:var(--accent); color:#fff; }
   .rank { text-align:left; display:inline-block; font-size:16px; }
-  .friend { margin-top:20px; padding:14px 10px; background:#fff3e3; border-radius:14px; }
+  .friend { margin-top:20px; padding:14px 10px; background:var(--soft); border-radius:14px; }
   .friend .ft { font-size:14px; margin:0 0 6px; }
   .fresult { font-size:15px; font-weight:700; color:var(--accent); margin-top:10px; min-height:22px; }
-  .coupon { margin-top:18px; padding:12px; border:2px dashed var(--accent); border-radius:14px; background:#fffaf2; font-size:14px; line-height:1.5; }
+  .coupon { margin-top:18px; padding:12px; border:2px dashed var(--accent); border-radius:14px; background:var(--soft); font-size:14px; line-height:1.5; }
   .coupon b { color:var(--accent); font-size:15px; }
-  button.share { display:block; width:100%; margin-top:18px; padding:12px; border:2px solid var(--accent); background:#fff; color:var(--accent); font-size:15px; font-weight:700; border-radius:14px; }
-  .follow { display:block; margin-top:12px; padding:12px 14px; border-radius:14px; background:#222; color:#fff; text-decoration:none; font-size:15px; font-weight:700; }
-  .note { font-size:11px; color:#999; margin-top:18px; text-align:center; max-width:380px; line-height:1.6; }
-  .note a { color:#999; }
+  button.share { display:block; width:100%; margin-top:18px; padding:12px; border:2px solid var(--accent); background:var(--btnbg); color:var(--accent); font-size:15px; font-weight:700; border-radius:14px; }
+  .follow { display:block; margin-top:12px; padding:12px 14px; border-radius:14px; background:#222; color:#fff; text-decoration:none; font-size:15px; font-weight:700; border:1px solid #444; }
+  .followcard { display:block; margin-top:16px; padding:16px 14px; border-radius:16px; background:#222; color:#fff; text-decoration:none; border:2px solid var(--accent); line-height:1.6; }
+  .followcard b { display:block; font-size:17px; }
+  .followcard span { font-size:13px; opacity:.9; }
+  .note { font-size:11px; color:var(--note); margin-top:18px; text-align:center; max-width:380px; line-height:1.6; }
+  .note a { color:var(--note); }
 </style>
 </head>
 <body>
@@ -43,23 +54,78 @@
 <div class="note">
   タッチ回数を記録しています（このスマホの中だけに保存）<br>
   名前・連絡先などは集めません<br>
+  <span id="venue"></span>
   <a href="#" id="reset">記録を消す</a>
 </div>
 
 <script>
 (function () {
-  var KEY = "kumarun_v1";
   var TIKTOK = "https://www.tiktok.com/@rg99do";
+  var EVENT_NAME = "";  // ライブ名などを入れると、ライブ版の見出しに出ます（空のままでOK）
+  var LIVE_START = "";  // 開演時刻。入れると、その時刻から「ライブ中」画面に切り替わります。例: "2026-11-20T18:00:00+09:00"
+  var LIVE_END = "2026-11-15T18:00:00+09:00";    // 終演時刻。入れると、その時刻から「終演後」画面に切り替わります。例: "2026-11-20T21:00:00+09:00"
+  var FOLLOW_SUB = "気軽に見に来てね✨"; // TikTokカードの説明文
+
+  var params = null;
+  try { params = new URLSearchParams(location.search); } catch (e) {}
+  var MODE = (params && params.get("mode") === "live") ? "live" : "food";
+  var shopKey = (params && params.get("shop")) || "";
+  var KEY = MODE === "live" ? "kumarun_live_v1" : "kumarun_v1";
+  if (MODE === "live") document.body.className = "live";
+
+  // 開演前(before) / ライブ中(during) / 終演後(after)。?when=after のように手動で切り替えもできます
+  var PHASE = "before";
+  if (MODE === "live") {
+    var w = params && params.get("when");
+    if (w === "before" || w === "during" || w === "after") {
+      PHASE = w;
+    } else {
+      var tnow = Date.now();
+      if (LIVE_END && tnow >= Date.parse(LIVE_END)) PHASE = "after";
+      else if (LIVE_START && tnow >= Date.parse(LIVE_START)) PHASE = "during";
+    }
+  }
+  var AFTER_MODE = PHASE === "after";
+  var DURING_MODE = PHASE === "during";
+
+  // ===== ご飯版 =====
   var FOODS = ["ラーメン", "カレー", "甘いもの"];
   var LUCK = ["ラーメン運◎", "カレー運○", "寿司運◎", "たこ焼き運○", "甘いもの運◎", "うどん運○", "焼き肉運◎", "おにぎり運○"];
-  var TITLES = { "ラーメン": "ラーメン番長", "カレー": "カレー博士", "甘いもの": "スイーツ大使" };
+  var FOOD_TITLES = { "ラーメン": "ラーメン番長", "カレー": "カレー博士", "甘いもの": "スイーツ大使" };
+
+  // ===== ライブ版 =====
+  var TYPES = ["盛り上がる曲🔥", "バラード✨", "全部好き！"];
+  var DURING = ["ワクワク最高🔥", "ドキドキ✨", "もう感動…🥹"];
+  var DURING_MSG = {
+    "ワクワク最高🔥": "その熱量、くまも一緒だよ！全力で楽しもう🔥",
+    "ドキドキ✨": "このドキドキも、今日の大事な思い出だよ✨",
+    "もう感動…🥹": "その気持ち、ライブが終わったあとも大切にしてね🥹"
+  };
+  var AFTER = ["盛り上がった瞬間🔥", "感動した瞬間✨", "全部最高！"];
+  var SATS = ["★★★★★", "★★★★☆", "★★★☆☆"];
+  var LIVE_TITLES = { "盛り上がる曲🔥": "全力応援型", "バラード✨": "感動型", "全部好き！": "バランス型" };
+  var LIVE_FORTUNE = [
+    "超大吉：忘れられない瞬間が待ってる🔥",
+    "大吉：隣の人とも最高に盛り上がれる✨",
+    "神引き：ライブ後も語りたくなる夜🌈",
+    "吉：全力で楽しめば優勝🏆",
+    "特吉：今日の思い出は一生モノ💎"
+  ];
+  var LIVE_MISSION = [
+    "誰か1人に『今日どの曲が楽しみですか？』と聞いてみよう！",
+    "ライブ前に笑顔で挨拶してみよう！",
+    "最高の瞬間を1枚だけ写真に残そう！（撮影OKの場所で）",
+    "今日いちばん好きな曲を決めよう！",
+    "全力で楽しんで後悔ゼロにしよう🔥"
+  ];
+
+  var OPTIONS = AFTER_MODE ? AFTER : (MODE === "live" ? TYPES : FOODS);
+  var TITLES = MODE === "live" ? LIVE_TITLES : FOOD_TITLES;
 
   // 店ごとの特典。URLの最後に ?shop=demo のように付けたときだけ表示されます。
   var SHOPS = {
     demo: { name: "デモ店", c3: "ドリンク1杯サービス（デモ表示）", c5: "トッピング1つ無料（デモ表示）" }
   };
-  var shopKey = "";
-  try { shopKey = new URLSearchParams(location.search).get("shop") || ""; } catch (e) {}
   var shop = SHOPS[shopKey] || null;
 
   function load() {
@@ -76,33 +142,67 @@
     return "信頼状態";
   }
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
+  }
 
   var s = load() || { count: 0, lastChoice: null, lastAt: 0, history: [], transitions: [] };
   var now = Date.now();
+
+  function drawToday() {
+    s.todayLuck = MODE === "live" ? pick(LIVE_FORTUNE) : pick(LUCK);
+    s.todayMission = MODE === "live" ? pick(LIVE_MISSION) : "";
+  }
 
   if (!s.lastAt || now - s.lastAt > 30000) {
     var before = stateName(s.count);
     s.count += 1;
     var after = stateName(s.count);
-    s.history.push({ at: now, count: s.count, shop: shopKey });
+    s.history.push({ at: now, count: s.count, shop: shopKey, mode: MODE, phase: PHASE });
     if (before !== after) s.transitions.push({ at: now, from: before, to: after });
-    s.todayLuck = pick(LUCK);
+    drawToday();
     s.lastAt = now;
     save(s);
   }
-  if (!s.todayLuck) { s.todayLuck = pick(LUCK); save(s); }
+  if (!s.todayLuck) { drawToday(); save(s); }
+  // 日付が変わったら、ライブ当日の選択（ライブ中・終演後）をリセット
+  if (MODE === "live" && s.liveDate !== todayStr()) {
+    s.afterChoice = null; s.afterSat = null; s.duringChoice = null;
+    s.liveDate = todayStr();
+    save(s);
+  }
 
   var card = document.getElementById("card");
+  if (MODE === "live") document.getElementById("venue").innerHTML = "会場のルールを守って、みんなで楽しもう<br>";
 
   function choicesHtml() {
-    return '<div class="choices">' + FOODS.map(function (f) {
+    return '<div class="choices">' + (MODE === "live" ? TYPES : FOODS).map(function (f) {
       return '<button class="choice' + (s.lastChoice === f ? " on" : "") + '" data-f="' + f + '">' + f + '</button>';
+    }).join("") + '</div>';
+  }
+  function duringChoicesHtml() {
+    return '<div class="choices">' + DURING.map(function (f) {
+      return '<button class="dchoice' + (s.duringChoice === f ? " on" : "") + '" data-d="' + f + '">' + f + '</button>';
+    }).join("") + '</div>';
+  }
+  function afterChoicesHtml() {
+    return '<div class="choices">' + AFTER.map(function (f) {
+      return '<button class="achoice' + (s.afterChoice === f ? " on" : "") + '" data-a="' + f + '">' + f + '</button>';
+    }).join("") + '</div>';
+  }
+  function satChoicesHtml() {
+    return '<div class="choices">' + SATS.map(function (f) {
+      return '<button class="schoice' + (s.afterSat === f ? " on" : "") + '" data-s="' + f + '">' + f + '</button>';
     }).join("") + '</div>';
   }
 
   function friendHtml() {
-    return '<div class="friend"><p class="ft">友達と一緒？<br>友達の画面は何が出た？</p>' +
-      '<div class="choices" style="margin-top:6px">' + FOODS.map(function (f) {
+    var q = AFTER_MODE ? "友達と一緒？<br>友達のベストな瞬間は？"
+          : MODE === "live" ? "友達と一緒？<br>友達はどのタイプ？"
+          : "友達と一緒？<br>友達の画面は何が出た？";
+    return '<div class="friend"><p class="ft">' + q + '</p>' +
+      '<div class="choices" style="margin-top:6px">' + OPTIONS.map(function (f) {
         return '<button class="fchoice" data-ff="' + f + '">' + f + '</button>';
       }).join("") + '</div><div class="fresult" id="fresult"></div></div>';
   }
@@ -117,45 +217,153 @@
   function titleLine() {
     return s.title ? '<div class="mytitle">あなたの称号：<b>' + s.title + '</b></div>' : "";
   }
+  function missionHtml() {
+    return s.todayMission ? '<div class="mission">🎯 今日のミッション<br>' + s.todayMission + '</div>' : "";
+  }
+  function teaserHtml() {
+    return '<div class="teaser">ライブが終わったら、もう一度タッチして<br>「今日の思い出カード」を作ろう🎆</div>';
+  }
+  function disclaimerHtml() {
+    if (MODE !== "live") return "";
+    return '<div class="memo"><div class="mh">🐻 くまルンから</div>' +
+      '<div style="text-align:center">このページは、ファンが個人的に作ったものです。<br>公式とは関係ありません。</div>' +
+      '<div class="mt">今日のライブが、あなたにとって最高の思い出になりますように✨</div></div>';
+  }
+  function cardReady() { return AFTER_MODE && s.afterChoice && s.afterSat; }
+  function followHtml() {
+    if (cardReady()) {
+      return '<a class="followcard" href="' + TIKTOK + '" target="_blank" rel="noopener"><b>🐻 くまルンの日記</b><span>' + FOLLOW_SUB + '</span></a>';
+    }
+    return '<a class="follow" href="' + TIKTOK + '" target="_blank" rel="noopener">🐻 くまルンの日記（TikTok）</a>';
+  }
+
+  function bodyFood(n) {
+    if (n === 1) {
+      return '<div class="bear">🐻</div><h1>はじめまして！</h1><p>今日のご飯運</p>' +
+        '<div class="fortune">' + s.todayLuck + '</div><p>何が出た？くまに教えてね</p>' + choicesHtml();
+    } else if (n === 2) {
+      var prev = s.lastChoice ? '前回は「' + s.lastChoice + '」を選んだよね' : '来てくれてうれしい！';
+      var rec = s.lastChoice === "ラーメン" ? "辛いラーメン" : s.lastChoice === "カレー" ? "スパイスカレー" : s.lastChoice === "甘いもの" ? "プリン" : "くまのおすすめ定食";
+      return '<div class="bear">🐻</div><h1>また来てくれたね！</h1><p>' + prev + '</p>' +
+        '<p>今日のご飯運</p><div class="fortune">' + s.todayLuck + '</div><p>くまのおすすめ：<b>' + rec + '</b></p>' + choicesHtml();
+    } else if (n === 3) {
+      return '<div class="bear">🐻🎉</div><h1>3回目！称号ゲット</h1><p>あなたは</p>' +
+        '<div class="title">' + s.title + '</div><p>に認定されました</p>' +
+        '<p style="font-size:14px;color:var(--sub)">スクショして友達に見せてね</p>' +
+        '<div class="rank">くま特別ランキング<br>1位 カレー ／ 2位 寿司 ／ 3位 ラーメン</div>' + choicesHtml();
+    } else if (n === 4) {
+      return '<div class="bear">🐻</div><h1>だいぶ仲良しになったね</h1><p>今日のご飯運</p>' +
+        '<div class="fortune">大吉🍙</div><p>一緒に食べる人を探すと運気UP</p>' + titleLine() + choicesHtml();
+    }
+    return '<div class="bear">🐻✨</div><h1>くまの特別なお友達に認定！</h1><p>' + n + '回も会いに来てくれたね</p>' +
+      '<div class="fortune">限定の運勢</div><p>今日だけの特別なご飯運：<b>' + s.todayLuck + '</b></p>' + titleLine();
+  }
+
+  function bodyLiveBefore(n) {
+    var ev = EVENT_NAME ? EVENT_NAME + " " : "";
+    if (n === 1) {
+      return '<div class="bear">🐻🔥</div><h1>' + ev + '開演前モード</h1><p>今日の最高の瞬間を、一緒に探そう</p>' +
+        '<p>今日いちばん楽しみな曲のタイプは？</p>' + choicesHtml() + missionHtml() + teaserHtml();
+    } else if (n === 2) {
+      var prev = s.lastChoice ? '前回は「' + s.lastChoice + '」を選んだよね' : 'また会えてうれしい！';
+      return '<div class="bear">🐻🔥</div><h1>また会えたね！</h1><p>' + prev + '</p>' +
+        '<p>このタイプ、きっと会場にも仲間がいるよ！</p>' +
+        '<p>ライブ運おみくじ</p><div class="fortune sm">' + s.todayLuck + '</div>' + choicesHtml() + missionHtml() + teaserHtml();
+    } else if (n === 3) {
+      return '<div class="bear">🐻🎉</div><h1>3回目！称号ゲット</h1><p>あなたは</p>' +
+        '<div class="title">' + s.title + '</div><p>に認定されました</p>' +
+        '<p style="font-size:14px;color:var(--sub)">スクショして友達に見せてね</p>' + choicesHtml() + missionHtml() + teaserHtml();
+    } else if (n === 4) {
+      return '<div class="bear">🐻🔥</div><h1>だいぶ仲良しになったね</h1><p>ライブ運おみくじ</p>' +
+        '<div class="fortune sm">' + s.todayLuck + '</div>' + titleLine() + choicesHtml() + missionHtml() + teaserHtml();
+    }
+    return '<div class="bear">🐻✨</div><h1>くまの特別な仲間に認定！</h1><p>' + n + '回も会えたね</p>' +
+      '<div class="fortune sm">' + s.todayLuck + '</div>' + titleLine() + missionHtml() + teaserHtml();
+  }
+
+  function bodyLiveDuring(n) {
+    var ev = EVENT_NAME ? EVENT_NAME + " " : "";
+    var html = '<div class="bear">🐻📣</div><h1>' + ev + 'ライブ中！</h1><p>いまは全力で楽しもう🔥</p>' +
+      '<p style="font-size:14px;color:var(--sub)">スマホはしまって、目の前のステージへ</p>' +
+      '<div class="ask">いまの気持ちは？</div>' + duringChoicesHtml();
+    if (s.duringChoice) html += '<div class="mission">' + DURING_MSG[s.duringChoice] + '</div>';
+    html += '<div class="teaser">ライブが終わったら、もう一度タッチして<br>「今日の思い出カード」を作ろう🎆</div>';
+    return html;
+  }
+
+  function bodyLiveAfter(n) {
+    var ev = EVENT_NAME ? EVENT_NAME + " " : "";
+    var pre = s.lastChoice ? '開演前は「' + s.lastChoice + '」タイプだったよね' : '';
+    var type = s.title || LIVE_TITLES[s.lastChoice] || "ライブ仲間";
+    var html = '<div class="bear">🐻🎆</div><h1>' + ev + 'ライブおつかれさま！</h1>' +
+      (pre ? '<p>' + pre + '</p>' : '') +
+      '<div class="ask">今日のベストな瞬間は？</div>' + afterChoicesHtml() +
+      '<div class="ask">今日の満足度は？</div>' + satChoicesHtml();
+    if (cardReady()) {
+      html += '<div class="memo"><div class="mh">🐻 今日の思い出カード</div>' +
+        '<div>📅 ' + todayStr() + '</div>' +
+        '<div>🎫 タイプ：' + type + '</div>' +
+        '<div>⭐ ベスト：' + s.afterChoice + '</div>' +
+        '<div>💯 満足度：' + s.afterSat + '</div>' +
+        '<div class="mt">スクショして保存してね✨</div></div>';
+      html += '<div class="memo"><div class="mh">🐻 またどこかの会場で！</div>' +
+        '<div style="text-align:center">見かけたら<br>「くまルンだ！」<br>って声をかけてね🔥</div>' +
+        '<div class="mt">同じライブを楽しんだ仲間として、素敵な思い出になりますように</div></div>';
+    } else {
+      html += '<div class="teaser">2つ選ぶと、思い出カードができるよ🎆</div>';
+    }
+    if (n >= 5) html += '<p style="font-size:14px;color:var(--sub)">' + n + '回も会えた特別な仲間だよ🐻✨</p>';
+    return html;
+  }
 
   function render() {
-    var n = s.count, html = "";
+    var n = s.count;
     if (n >= 3 && !s.title) {
       s.title = TITLES[s.lastChoice] || "くま見習い";
       save(s);
     }
     var head = '<div class="counter"><div class="label">タッチ回数</div><div class="num">' + n + '<small>回</small></div></div>' +
                '<div class="state">' + stateName(n) + '</div>';
-    if (n === 1) {
-      html = head + '<div class="bear">🐻</div><h1>はじめまして！</h1><p>今日のご飯運</p>' +
-        '<div class="fortune">' + s.todayLuck + '</div><p>何が出た？くまに教えてね</p>' + choicesHtml();
-    } else if (n === 2) {
-      var prev = s.lastChoice ? '前回は「' + s.lastChoice + '」を選んだよね' : '来てくれてうれしい！';
-      var rec = s.lastChoice === "ラーメン" ? "辛いラーメン" : s.lastChoice === "カレー" ? "スパイスカレー" : s.lastChoice === "甘いもの" ? "プリン" : "くまのおすすめ定食";
-      html = head + '<div class="bear">🐻</div><h1>また来てくれたね！</h1><p>' + prev + '</p>' +
-        '<p>今日のご飯運</p><div class="fortune">' + s.todayLuck + '</div><p>くまのおすすめ：<b>' + rec + '</b></p>' + choicesHtml();
-    } else if (n === 3) {
-      html = head + '<div class="bear">🐻🎉</div><h1>3回目！称号ゲット</h1><p>あなたは</p>' +
-        '<div class="title">' + s.title + '</div><p>に認定されました</p>' +
-        '<p style="font-size:14px;color:#8a6a4f">スクショして友達に見せてね</p>' +
-        '<div class="rank">くま特別ランキング<br>1位 カレー ／ 2位 寿司 ／ 3位 ラーメン</div>' + choicesHtml();
-    } else if (n === 4) {
-      html = head + '<div class="bear">🐻</div><h1>だいぶ仲良しになったね</h1><p>今日のご飯運</p>' +
-        '<div class="fortune">大吉🍙</div><p>一緒に食べる人を探すと運気UP</p>' + titleLine() + choicesHtml();
-    } else {
-      html = head + '<div class="bear">🐻✨</div><h1>くまの特別なお友達に認定！</h1><p>' + n + '回も会いに来てくれたね</p>' +
-        '<div class="fortune">限定の運勢</div><p>今日だけの特別なご飯運：<b>' + s.todayLuck + '</b></p>' + titleLine();
-    }
-    if (n >= 2) html += friendHtml();
+    var body = MODE === "live"
+      ? (AFTER_MODE ? bodyLiveAfter(n) : DURING_MODE ? bodyLiveDuring(n) : bodyLiveBefore(n))
+      : bodyFood(n);
+    var html = head + body;
+    var showFriend = DURING_MODE ? false : (AFTER_MODE ? !!s.afterChoice : n >= 2);
+    if (showFriend) html += friendHtml();
     html += couponHtml(n);
+    html += disclaimerHtml();
     html += '<button class="share" id="share">友達に見せる・送る 🐻</button>';
-    html += '<a class="follow" href="' + TIKTOK + '" target="_blank" rel="noopener">TikTokでフォロー＆DMしてね 🐻</a>';
+    html += followHtml();
     card.innerHTML = html;
 
     var btns = card.querySelectorAll("button.choice");
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener("click", function (e) {
         s.lastChoice = e.currentTarget.getAttribute("data-f");
+        save(s);
+        render();
+      });
+    }
+    var dbtns = card.querySelectorAll("button.dchoice");
+    for (var d = 0; d < dbtns.length; d++) {
+      dbtns[d].addEventListener("click", function (e) {
+        s.duringChoice = e.currentTarget.getAttribute("data-d");
+        save(s);
+        render();
+      });
+    }
+    var abtns = card.querySelectorAll("button.achoice");
+    for (var a = 0; a < abtns.length; a++) {
+      abtns[a].addEventListener("click", function (e) {
+        s.afterChoice = e.currentTarget.getAttribute("data-a");
+        save(s);
+        render();
+      });
+    }
+    var sbtns = card.querySelectorAll("button.schoice");
+    for (var q2 = 0; q2 < sbtns.length; q2++) {
+      sbtns[q2].addEventListener("click", function (e) {
+        s.afterSat = e.currentTarget.getAttribute("data-s");
         save(s);
         render();
       });
@@ -169,17 +377,33 @@
         for (var k = 0; k < all.length; k++) all[k].classList.remove("on");
         e.currentTarget.classList.add("on");
         var out = document.getElementById("fresult");
-        if (!s.lastChoice) { out.textContent = "先に自分の分を選んでね 🐻"; return; }
-        out.textContent = (ff === s.lastChoice)
-          ? "ご飯の好みがぴったり！今日は一緒に食べると◎ 🍚"
-          : "違うからこそ、分け合うと◎ 半分こしてみて 🍴";
+        var ref = AFTER_MODE ? s.afterChoice : s.lastChoice;
+        if (!ref) { out.textContent = "先に自分の分を選んでね 🐻"; return; }
+        if (AFTER_MODE) {
+          out.textContent = (ff === ref)
+            ? "同じ瞬間で盛り上がってたんだ！語り合おう 🔥"
+            : "違う瞬間も聞いてみよう。新しい発見があるかも ✨";
+        } else if (MODE === "live") {
+          out.textContent = (ff === ref)
+            ? "同じタイプ発見！今日は一緒に盛り上がれるね 🔥"
+            : "違うタイプだからこそ、お互いのおすすめを聞いてみて ✨";
+        } else {
+          out.textContent = (ff === ref)
+            ? "ご飯の好みがぴったり！今日は一緒に食べると◎ 🍚"
+            : "違うからこそ、分け合うと◎ 半分こしてみて 🍴";
+        }
       });
     }
 
     var sh = document.getElementById("share");
     if (sh) sh.addEventListener("click", function () {
-      var url = location.origin + location.pathname + (shopKey ? "?shop=" + encodeURIComponent(shopKey) : "");
-      var text = "くまルンで今日のご飯運を見たよ🐻 触るたびに変わるよ";
+      var q = [];
+      if (MODE === "live") q.push("mode=live");
+      if (shopKey) q.push("shop=" + encodeURIComponent(shopKey));
+      var url = location.origin + location.pathname + (q.length ? "?" + q.join("&") : "");
+      var text = AFTER_MODE ? "ライブの思い出カードを作ったよ🐻🎆"
+               : MODE === "live" ? "くまルンのライブ版で遊んだよ🐻🔥 触るたびに変わるよ"
+               : "くまルンで今日のご飯運を見たよ🐻 触るたびに変わるよ";
       if (navigator.share) {
         navigator.share({ title: "くまルン", text: text, url: url }).catch(function () {});
       } else if (navigator.clipboard) {
